@@ -21,11 +21,13 @@ class MyApp extends StatelessWidget {
   }
 }
 
-class CounterNotifier extends StateNotifier<int> {
-  CounterNotifier() : super(0);
+class Counter extends ChangeNotifier {
+  int _counter = 0;
+  get counter => _counter;
 
   void countUp() {
-    state++;
+    _counter++;
+    notifyListeners();
   }
 }
 
@@ -34,8 +36,7 @@ class MyHomePage extends ConsumerWidget {
 
   final String title;
 
-  final _provider =
-      StateNotifierProvider<CounterNotifier, int>((ref) => CounterNotifier());
+  final _provider = ChangeNotifierProvider((ref) => Counter());
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -51,14 +52,14 @@ class MyHomePage extends ConsumerWidget {
               'You have pushed the button this many times:',
             ),
             Text(
-              '${ref.watch(_provider)}',
+              '${ref.watch(_provider).counter}',
               style: Theme.of(context).textTheme.headline4,
             ),
           ],
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () => ref.watch(_provider.notifier).countUp(),
+        onPressed: () => ref.watch(_provider).countUp(),
         tooltip: 'Increment',
         child: const Icon(Icons.add),
       ), // This trailing comma makes auto-formatting nicer for build methods.
