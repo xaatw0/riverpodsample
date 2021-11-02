@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -22,16 +24,21 @@ class MyApp extends StatelessWidget {
   }
 }
 
+StreamController<int> streamController = StreamController();
+
 class MyHomePage extends ConsumerWidget {
   MyHomePage({Key? key, required this.title}) : super(key: key);
 
   final String title;
-  static const KEY = 'KEY';
 
-  final _provider = FutureProvider<int>((ref) async {
-    final prefs = await SharedPreferences.getInstance();
-    return prefs.getInt(KEY) ?? 0;
+  final _provider = StreamProvider<int>((ref) {
+    if (streamController.hasListener) {
+      streamController = StreamController();
+    }
+    return streamController.stream;
   });
+
+  int _counter = 0;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -52,17 +59,15 @@ class MyHomePage extends ConsumerWidget {
                     style: Theme.of(context).textTheme.headline4,
                   ),
                   loading: (data) => const CircularProgressIndicator(),
-                  error: (error, stack, data) => Text('error'),
+                  error: (error, stack, data) => Text('${error}'),
                 ),
           ],
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () async {
-          final prefs = await SharedPreferences.getInstance();
-          int currentValue = prefs.getInt(KEY) ?? 0;
-          prefs.setInt(KEY, currentValue + 1);
-          ref.refresh(_provider);
+        onPressed: () {
+          _counter++;
+          streamController.sink.add(_counter);
         },
         tooltip: 'Increment',
         child: const Icon(Icons.add),
