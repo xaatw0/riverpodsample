@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
   runApp(ProviderScope(child: const MyApp()));
@@ -21,22 +22,16 @@ class MyApp extends StatelessWidget {
   }
 }
 
-class Counter extends ChangeNotifier {
-  int _counter = 0;
-  get counter => _counter;
-
-  void countUp() {
-    _counter++;
-    notifyListeners();
-  }
-}
-
 class MyHomePage extends ConsumerWidget {
   MyHomePage({Key? key, required this.title}) : super(key: key);
 
   final String title;
+  static const KEY = 'KEY';
 
-  final _provider = ChangeNotifierProvider((ref) => Counter());
+  final _provider = FutureProvider<int>((ref) async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getInt(KEY) ?? 0;
+  });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -51,15 +46,24 @@ class MyHomePage extends ConsumerWidget {
             Text(
               'You have pushed the button this many times:',
             ),
-            Text(
-              '${ref.watch(_provider).counter}',
-              style: Theme.of(context).textTheme.headline4,
-            ),
+            ref.watch(_provider).when(
+                  data: (data) => Text(
+                    '${ref.watch(_provider).value}',
+                    style: Theme.of(context).textTheme.headline4,
+                  ),
+                  loading: (data) => const CircularProgressIndicator(),
+                  error: (error, stack, data) => Text('error'),
+                ),
           ],
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () => ref.watch(_provider).countUp(),
+        onPressed: () async {
+          final prefs = await SharedPreferences.getInstance();
+          int currentValue = prefs.getInt(KEY) ?? 0;
+          prefs.setInt(KEY, currentValue + 1);
+          ref.refresh(_provider);
+        },
         tooltip: 'Increment',
         child: const Icon(Icons.add),
       ), // This trailing comma makes auto-formatting nicer for build methods.
