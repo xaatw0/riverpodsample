@@ -16,56 +16,51 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      home: MyHomePage(title: 'Flutter Demo Home Page'),
     );
   }
 }
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({Key? key, required this.title}) : super(key: key);
+class CounterNotifier extends StateNotifier<int> {
+  CounterNotifier() : super(0);
+
+  void countUp() {
+    state++;
+  }
+}
+
+class MyHomePage extends ConsumerWidget {
+  MyHomePage({Key? key, required this.title}) : super(key: key);
 
   final String title;
 
-  @override
-  State<MyHomePage> createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> {
-  Provider<String> _provider =
-      Provider((ref) => 'You have pushed the button this many times:');
-
-  StateProvider<int> _stateProvider = StateProvider((ref) => 0);
+  final _provider =
+      StateNotifierProvider<CounterNotifier, int>((ref) => CounterNotifier());
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.title),
+        title: Text(title),
       ),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            Consumer(
-              builder: (context, ref, child) => Text(
-                ref.watch(_provider),
-              ),
+            Text(
+              'You have pushed the button this many times:',
             ),
-            Consumer(
-              builder: (context, ref, child) => Text(
-                '${ref.watch(_stateProvider).state}',
-                style: Theme.of(context).textTheme.headline4,
-              ),
+            Text(
+              '${ref.watch(_provider)}',
+              style: Theme.of(context).textTheme.headline4,
             ),
           ],
         ),
       ),
-      floatingActionButton: Consumer(
-        builder: (context, ref, child) => FloatingActionButton(
-          onPressed: () => ref.read(_stateProvider).state++,
-          tooltip: 'Increment',
-          child: const Icon(Icons.add),
-        ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () => ref.watch(_provider.notifier).countUp(),
+        tooltip: 'Increment',
+        child: const Icon(Icons.add),
       ), // This trailing comma makes auto-formatting nicer for build methods.
     );
   }
