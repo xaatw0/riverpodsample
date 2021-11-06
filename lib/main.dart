@@ -63,10 +63,14 @@ class _MyHomePageState extends State<MyHomePage> {
       floatingActionButton: Consumer(
         builder: (context, ref, child) => FloatingActionButton(
           onPressed: () {
-            ref.read(_stateProvider.state).state++;
+            //ref.read(_stateProvider.state).state++;
             //ref.read(_stateProvider.state).state = ref.read(_stateProvider) + 1;
             //ref.read(_stateProvider.state).update((state) => state + 1);
+
             //ref.read(_stateProvider.notifier).state++;
+            ref.read(_stateProvider.notifier).state =
+                ref.read(_stateProvider) + 1;
+            //ref.read(_stateProvider.notifier).update((state) => state + 1);
           },
           tooltip: 'Increment',
           child: const Icon(Icons.add),
