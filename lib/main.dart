@@ -65,7 +65,8 @@ class _MyHomePageState extends State<MyHomePage> {
           onPressed: () {
             ref.read(_stateProvider.state).state++;
             //ref.read(_stateProvider.state).state = ref.read(_stateProvider) + 1;
-            // ref.read(_stateProvider.state).update((state) => state + 1);
+            //ref.read(_stateProvider.state).update((state) => state + 1);
+            //ref.read(_stateProvider.notifier).state++;
           },
           tooltip: 'Increment',
           child: const Icon(Icons.add),
