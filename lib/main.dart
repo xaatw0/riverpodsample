@@ -53,7 +53,7 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
             Consumer(
               builder: (context, ref, child) => Text(
-                '${ref.watch(_stateProvider).state}',
+                '${ref.watch(_stateProvider)}',
                 style: Theme.of(context).textTheme.headline4,
               ),
             ),
@@ -62,7 +62,11 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
       floatingActionButton: Consumer(
         builder: (context, ref, child) => FloatingActionButton(
-          onPressed: () => ref.read(_stateProvider).state++,
+          onPressed: () {
+            ref.read(_stateProvider.state).state++;
+            //ref.read(_stateProvider.state).state = ref.read(_stateProvider) + 1;
+            // ref.read(_stateProvider.state).update((state) => state + 1);
+          },
           tooltip: 'Increment',
           child: const Icon(Icons.add),
         ),
